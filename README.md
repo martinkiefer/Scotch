@@ -16,5 +16,6 @@ A publication on Scotch is currently prepared. Stay tuned for the publication an
 * An FPGA toolchain is required. For now, only IntelFPGAs / Quartus Prime is supported, Xilinx support is planned. We tested with Quartus Prime Pro 19.3 and Quartus Prime 19.1. Thus all *10 and *V product lines should be supported.
 
 ## Project Structure
-ScotchDSL: Contains all code generator files and implementations of various algorithms in ScotchDSL.
-Autotune: Contains all files regarding automated-tuning.
+**ScotchDSL:** Contains all code generator files and implementations of various algorithms in ScotchDSL.
+
+**Autotune:** Contains all files regarding automated tuning.
