@@ -23,3 +23,5 @@ A publication on Scotch is currently prepared. Stay tuned for the publication an
 **Autotune:** Contains all files regarding automated tuning.
 
 **Baselines:** CPU and GPU baseline implementations.
+
+**Sketches:** ScotchDSL implementations of sketching algorithms.
