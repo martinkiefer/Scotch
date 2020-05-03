@@ -1,0 +1,19 @@
+{
+    "update_seed_size" : 33,
+    "value_size" : 32,
+    "state_size" : 32,
+    "parallel_values" : 8,
+    "compute_out_size" : 2,
+    "compute_neutral" : "\"00\"",
+    "compute_function_file" : "eh3.scf",
+    "compute_function_variables" : {
+        "t1" : 1,
+        "t2" : 1
+    },
+    "update_function_file" : "eh3-add.suf",
+    "update_function_variables" : {
+        "t1" : 3,
+        "t2" : 4,
+        "t3" : 5
+    }
+}

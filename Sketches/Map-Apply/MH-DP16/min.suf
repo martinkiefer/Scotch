@@ -1,0 +1,13 @@
+for i in 0 to 7 {
+    t1[i] <= unsigned(v[i*2]) < unsigned(v[i*2+1]) ? v[i*2] : v[i*2+1];
+}
+
+for i in 0 to 3 {
+    t2[i] <= unsigned(t1[i*2]) < unsigned(t1[i*2+1]) ? t1[i*2] : t1[i*2+1];
+}
+
+for i in 0 to 1 {
+    t3[i] <= unsigned(t2[i*2]) < unsigned(t2[i*2+1]) ? t2[i*2] : t2[i*2+1];
+}
+
+outstate <= unsigned(t3[0]) < unsigned(t3[1]) ? t3[0] : t3[1];

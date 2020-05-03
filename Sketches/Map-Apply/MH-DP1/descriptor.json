@@ -1,0 +1,18 @@
+{
+    "update_seed_size" : 1024,
+    "value_size" : 32,
+    "state_size" : 32,
+    "parallel_values" : 1,
+    "compute_out_size" : 32,
+    "compute_neutral" : "\"11111111111111111111111111111111\"",
+    "initial_state" : "\"11111111111111111111111111111111\"",
+    "compute_function_file" : "h3.scf",
+    "compute_function_variables" : {
+        "t1" : 32,
+        "t2" : 32
+    },
+    "update_function_file" : "min.suf",
+    "update_function_variables" : {
+        "None" : "None"
+    }
+}

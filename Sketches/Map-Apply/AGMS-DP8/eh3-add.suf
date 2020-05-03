@@ -1,0 +1,12 @@
+for i in 0 to 3 {
+        t1[i] <= signed(v[i])+signed(v[i+4]);
+}
+
+for i in 0 to 1 {
+        t2[i] <= signed(t1[i])+signed(t1[i+2]);
+}
+
+	
+t3 <= signed(t2[0])+signed(t2[1]);
+
+outstate <= signed(state)+signed(t3);

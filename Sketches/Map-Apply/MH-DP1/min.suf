@@ -1,0 +1,1 @@
+outstate <= unsigned(v[0]) < unsigned(state) ? v[0] : state;

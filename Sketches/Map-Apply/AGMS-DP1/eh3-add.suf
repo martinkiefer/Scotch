@@ -1,0 +1,1 @@
+outstate <= signed(state)+signed(v[0]);

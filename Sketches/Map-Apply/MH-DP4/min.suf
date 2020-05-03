@@ -1,0 +1,5 @@
+for i in 0 to 1 {
+    t1[i] <= unsigned(v[i*2]) < unsigned(v[i*2+1]) ? v[i*2] : v[i*2+1];
+}
+
+outstate <= unsigned(t1[0]) < unsigned(t1[1]) ? t1[0] : t1[1];
