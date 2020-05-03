@@ -1,0 +1,11 @@
+{
+    "update_seed_size" : 33,
+    "value_size" : 32,
+    "state_size" : 32,
+    "update_function_file" : "eh3.suf",
+    "update_function_variables" : {
+        "t1" : 1,
+        "t2" : 1,
+        "t3" : 2
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "update_seed_size" : 1024,
+    "value_size" : 32,
+    "state_size" : 32,
+    "update_function_file" : "h3.suf",
+    "initial_state" : "\"11111111111111111111111111111111\"",
+    "update_function_variables" : {
+        "t1" : 32,
+        "t2" : 32,
+        "t3" : 32       
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "selector_seed_size" : 1024,
+    "update_seed_size" : 33,
+    "value_size" : 32,
+    "state_size" : 32,
+    "offset_max_size" : 32,
+    "selector_function_file" : "h3.ssf",
+    "selector_function_variables" : {
+        "t1" : 32,
+        "t2" : 32
+    },  
+    "update_function_file" : "eh3.suf",
+    "update_function_variables" : {
+        "t1" : 1,
+        "t2" : 1
+    }
+}
