@@ -11,7 +11,7 @@ A publication on Scotch is currently prepared. Stay tuned for the publication an
 ## Requirements
 * A recent Linux operating system. For the code generator, OSX will do either.
 * Python 3.6+ is required
-* The follwing Python modules are required: antlr4-python3-runtime, numpy, pandas
+* The following Python modules are required: antlr4-python3-runtime, numpy, pandas
 * The ANTLR4 parser generator is required to generate the ScotchDSL parser. A setup script is provided for your convenience, see README in the ScotchDSL folder.
 * An FPGA toolchain is required. For now, only Intel FPGAs / Quartus Prime is supported, Xilinx support is planned. We tested with Quartus Prime Pro 19.3 and Quartus Prime 19.1. Thus all *10 and *V product lines should be supported.
 * CPU baselines require GCC. We used GCC 6 and GCC 7.
