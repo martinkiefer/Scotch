@@ -4,7 +4,7 @@ Scotch is a framework for generating optimized FPGA-accelerators for sketching a
 It provides three core features:
 * ScotchDSL: A domain specific language + programming models to describe a variety of sketching algorithms
 * Code Generators: ScotchDSL specifications are automatically translated into a VHDL architecture containing all necessary components to perform sketching.
-* Auto-Tune: An automated tuning algorithms optimizes the size of the sketch summary with respect to provided constraints and resource consumption of the FPGA
+* Auto-Tune: An automated tuning algorithms optimizes the size of the sketch summary with respect to provided constraints and resources on the FPGA
 
 A publication on Scotch is currently prepared. Stay tuned for the publication and further documentation.
 
