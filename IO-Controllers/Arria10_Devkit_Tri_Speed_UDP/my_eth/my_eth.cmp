@@ -1,0 +1,52 @@
+	component my_eth is
+		port (
+			control_port_readdata    : out std_logic_vector(31 downto 0);                    -- readdata
+			control_port_read        : in  std_logic                     := 'X';             -- read
+			control_port_writedata   : in  std_logic_vector(31 downto 0) := (others => 'X'); -- writedata
+			control_port_write       : in  std_logic                     := 'X';             -- write
+			control_port_waitrequest : out std_logic;                                        -- waitrequest
+			control_port_address     : in  std_logic_vector(7 downto 0)  := (others => 'X'); -- address
+			control_port_clk_clk     : in  std_logic                     := 'X';             -- clk
+			mac_misc_xon_gen         : in  std_logic                     := 'X';             -- xon_gen
+			mac_misc_xoff_gen        : in  std_logic                     := 'X';             -- xoff_gen
+			mac_misc_ff_tx_crc_fwd   : in  std_logic                     := 'X';             -- ff_tx_crc_fwd
+			mac_misc_ff_tx_septy     : out std_logic;                                        -- ff_tx_septy
+			mac_misc_tx_ff_uflow     : out std_logic;                                        -- tx_ff_uflow
+			mac_misc_ff_tx_a_full    : out std_logic;                                        -- ff_tx_a_full
+			mac_misc_ff_tx_a_empty   : out std_logic;                                        -- ff_tx_a_empty
+			mac_misc_rx_err_stat     : out std_logic_vector(17 downto 0);                    -- rx_err_stat
+			mac_misc_rx_frm_type     : out std_logic_vector(3 downto 0);                     -- rx_frm_type
+			mac_misc_ff_rx_dsav      : out std_logic;                                        -- ff_rx_dsav
+			mac_misc_ff_rx_a_full    : out std_logic;                                        -- ff_rx_a_full
+			mac_misc_ff_rx_a_empty   : out std_logic;                                        -- ff_rx_a_empty
+			pcs_ref_clk_clk          : in  std_logic                     := 'X';             -- clk
+			receive_data             : out std_logic_vector(31 downto 0);                    -- data
+			receive_endofpacket      : out std_logic;                                        -- endofpacket
+			receive_error            : out std_logic_vector(5 downto 0);                     -- error
+			receive_empty            : out std_logic_vector(1 downto 0);                     -- empty
+			receive_ready            : in  std_logic                     := 'X';             -- ready
+			receive_startofpacket    : out std_logic;                                        -- startofpacket
+			receive_valid            : out std_logic;                                        -- valid
+			receive_clk_clk          : in  std_logic                     := 'X';             -- clk
+			reset_reset              : in  std_logic                     := 'X';             -- reset
+			serdes_export            : out std_logic;                                        -- export
+			serial_rxp_0             : in  std_logic                     := 'X';             -- rxp_0
+			serial_txp_0             : out std_logic;                                        -- txp_0
+			status_led_crs           : out std_logic;                                        -- crs
+			status_led_link          : out std_logic;                                        -- link
+			status_led_panel_link    : out std_logic;                                        -- panel_link
+			status_led_col           : out std_logic;                                        -- col
+			status_led_an            : out std_logic;                                        -- an
+			status_led_char_err      : out std_logic;                                        -- char_err
+			status_led_disp_err      : out std_logic;                                        -- disp_err
+			transmit_data            : in  std_logic_vector(31 downto 0) := (others => 'X'); -- data
+			transmit_endofpacket     : in  std_logic                     := 'X';             -- endofpacket
+			transmit_error           : in  std_logic                     := 'X';             -- error
+			transmit_empty           : in  std_logic_vector(1 downto 0)  := (others => 'X'); -- empty
+			transmit_ready           : out std_logic;                                        -- ready
+			transmit_startofpacket   : in  std_logic                     := 'X';             -- startofpacket
+			transmit_valid           : in  std_logic                     := 'X';             -- valid
+			transmit_clk_clk         : in  std_logic                     := 'X'              -- clk
+		);
+	end component my_eth;
+
