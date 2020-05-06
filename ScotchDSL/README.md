@@ -11,7 +11,9 @@ There are differente code generators available in ./Translation. They differ in 
 ## Matrix Sketches
 For matrix sketches, there is only ReplicatedMatrixSketchGenerator.py. It assumes the Select-Update model and uses the following arguments:
 
-```python3 ReplicatedMatrixSketchGenerator.py path_to_descriptor ram_depth rams_per_row nrows dispatch_branching_factor collect_branching_factor n_replicas output_dir```
+```
+python3 ReplicatedMatrixSketchGenerator.py path_to_descriptor ram_depth rams_per_row nrows dispatch_branching_factor collect_branching_factor n_replicas output_dir
+```
 
 **path_to_descriptor:** The path to the sketch descriptor.\
 **ram_depth:** Number of values per RAM segment. You probably want to choose this value depending as the depth fof the used BRAMs for the value size determined in the descriptor.\
