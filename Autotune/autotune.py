@@ -15,8 +15,8 @@ if __name__ == "__main__":
         #TODO: Add replicated and data parallel versions
         parser.add_argument("-generator", type=str, choices=["column", "matrix", "column-ma"], required=True)
 
-        parser.add_argument("-cfactor", type=int, help="Collect factor", required=True)
-        parser.add_argument("-dfactor", type=int, help="Dispatch factor", required=True)
+        parser.add_argument("-cfactor", type=int, help="Collect factor", default=4)
+        parser.add_argument("-dfactor", type=int, help="Dispatch factor", default=4)
         parser.add_argument("-initial_guess", type=int, help="Initial guess for autotune", default=16)
         parser.add_argument("-dp", type=int, help="Data Parallelism Degree")
 
