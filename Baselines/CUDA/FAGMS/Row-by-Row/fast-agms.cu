@@ -77,8 +77,6 @@ __device__ unsigned int parity(unsigned int x) {
 
     unsigned int my_c0_ls = c0_ls[r]; 
     unsigned int my_c0_ss = is_set(c0_ss[r/32], r % 32);
-    //unsigned int* my_c0_select_seed = (sketch < skn_rows) ? c0_select_seed + sketch : 0;
-
 
     for(int i = 0; i < 32; i++){
         sseeds[i] = c0_select_seed[r*32+i];
@@ -90,7 +88,6 @@ __device__ unsigned int parity(unsigned int x) {
             select = select % skn_cols;
 
             int update = ech3(c0[i],my_c0_ls,my_c0_ss);
-            //int update = 1;
             atomicAdd(&sketches[r*skn_cols+select], update);
     }
 }
@@ -147,16 +144,13 @@ double sketch_contruction(parameters* p){
     size_t global = target_utilization;
 
     auto begin = std::chrono::high_resolution_clock::now();
-    int iterations = 1;
-    for(int i = 0; i < iterations; i++){
-        for(unsigned int r = 0; r < p->skn_rows; r++){
-            construct_sketch<<<global/local, local>>>(r, (unsigned int) p->skn_cols, p->ts0, p->c0, p->c0_lseed, p->c0_sseed, p->c0_select_seed, p->sk_t0);
-            gpuErrchk(cudaPeekAtLastError());
-        }
+    for(unsigned int r = 0; r < p->skn_rows; r++){
+        construct_sketch<<<global/local, local>>>(r, (unsigned int) p->skn_cols, p->ts0, p->c0, p->c0_lseed, p->c0_sseed, p->c0_select_seed, p->sk_t0);
+        gpuErrchk(cudaPeekAtLastError());
     }
     cudaDeviceSynchronize();
     auto end = std::chrono::high_resolution_clock::now();
-    return std::chrono::duration_cast<std::chrono::milliseconds>(end-begin).count()/ (double) iterations;
+    return std::chrono::duration_cast<std::chrono::milliseconds>(end-begin).count();
 }
 
 
@@ -205,17 +199,5 @@ int main( int argc, const char* argv[] )
 
     writeSArrayToFile("sketch.dump", res, p.skn_rows*p.skn_cols);
     
-    /*Debugging print
-    for(int i = 0; i < p.skn_rows; i++){
-        //std::cout << "Row: | " << i << std::endl;
-        int row_sum = 0;
-        for(int j = 0; j < p.skn_cols; j++){
-            row_sum += res[i*p.skn_cols+ j];
-            std::cout << res[i*p.skn_cols+ j] << " | ";
-        }
-        std::cout << "| Sum: " << row_sum << std::endl;
-    }*/
-
-
     return 0;
 }

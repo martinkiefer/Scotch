@@ -43,19 +43,10 @@ __device__ unsigned int parity(unsigned int x) {
 }
 
 
-/* __device__ unsigned int h3(unsigned int x, unsigned int nsketches, unsigned long* seed) {
-    unsigned long hash = 0;
-    for(int i = 0; i < 16; i++){
-        unsigned long seed_l = seed[i*nsketches];
-        hash ^= seed_l & ((is_set(x,i*2)*0x00000000FFFFFFFFL) | (is_set(x, i*2+1)*0xFFFFFFFF00000000L)) ;
-    }
-    return ((unsigned int) hash ^ (unsigned int) (hash >> 32));
-}*/
-
  __device__ int ech3(unsigned int v, unsigned int seed, unsigned int sbit){
      //First we compute the bitwise AND between the seed and the value
-     //Aaaand here comes the parity
      int res = parity(v & seed) ^ nonlinear_h(v) ^ sbit ;
+     //Aaaand here comes the parity
      return 2*res-1;
  }
 
@@ -70,14 +61,8 @@ __device__ unsigned int parity(unsigned int x) {
     int* __restrict__ sketches) 
 {
     unsigned int sseeds[32];
-
     unsigned int global_size = gridDim.x * blockDim.x;
     unsigned int global_id = blockIdx.x * blockDim.x + threadIdx.x;
-
-
-    //unsigned int my_c0_ls = (sketch < skn_rows) ? c0_ls[sketch] : 0; 
-    //unsigned int my_c0_ss = (sketch < skn_rows) ? is_set(c0_ss[sketch/32], sketch % 32) : 0;
-    //unsigned int* my_c0_select_seed = (sketch < skn_rows) ? c0_select_seed + sketch : 0;
 
 
     for(int i = 0; i < 32; i++){
@@ -89,7 +74,6 @@ __device__ unsigned int parity(unsigned int x) {
             for(int k = 0; k < 32; k++)  if(is_set(c0[i],k)) select ^= sseeds[k] ;
             select = select % skn_cols;
 
-            //int update = ech3(c0[i],my_c0_ls,my_c0_ss);
             int update = 1;
             atomicAdd(&sketches[r*skn_cols+select], update);
     }
@@ -147,16 +131,13 @@ double sketch_contruction(parameters* p){
     size_t global = target_utilization;
 
     auto begin = std::chrono::high_resolution_clock::now();
-    int iterations = 1;
-    for(int i = 0; i < iterations; i++){
-        for(unsigned int r = 0; r < p->skn_rows; r++){
-            construct_sketch<<<global/local, local>>>(r, (unsigned int) p->skn_cols, p->ts0, p->c0, p->c0_lseed, p->c0_sseed, p->c0_select_seed, p->sk_t0);
-            gpuErrchk(cudaPeekAtLastError());
-        }
+    for(unsigned int r = 0; r < p->skn_rows; r++){
+        construct_sketch<<<global/local, local>>>(r, (unsigned int) p->skn_cols, p->ts0, p->c0, p->c0_lseed, p->c0_sseed, p->c0_select_seed, p->sk_t0);
+        gpuErrchk(cudaPeekAtLastError());
     }
     cudaDeviceSynchronize();
     auto end = std::chrono::high_resolution_clock::now();
-    return std::chrono::duration_cast<std::chrono::milliseconds>(end-begin).count()/ (double) iterations;
+    return std::chrono::duration_cast<std::chrono::milliseconds>(end-begin).count();
 }
 
 
@@ -205,17 +186,5 @@ int main( int argc, const char* argv[] )
 
     writeSArrayToFile("sketch.dump", res, p.skn_rows*p.skn_cols);
     
-    /*Debugging print
-    for(int i = 0; i < p.skn_rows; i++){
-        //std::cout << "Row: | " << i << std::endl;
-        int row_sum = 0;
-        for(int j = 0; j < p.skn_cols; j++){
-            row_sum += res[i*p.skn_cols+ j];
-            std::cout << res[i*p.skn_cols+ j] << " | ";
-        }
-        std::cout << "| Sum: " << row_sum << std::endl;
-    }*/
-
-
     return 0;
 }

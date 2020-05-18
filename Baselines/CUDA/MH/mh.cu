@@ -45,10 +45,37 @@ __device__ unsigned int parity(unsigned int x) {
 
  __device__ int ech3(unsigned int v, unsigned int seed, unsigned int sbit){
      //First we compute the bitwise AND between the seed and the value
-     //Aaaand here comes the parity
      int res = parity(v & seed) ^ nonlinear_h(v) ^ sbit ;
+     //Aaaand here comes the parity
      return 2*res-1;
  }
+
+ __global__ void construct_sketch_coalesced(
+    unsigned int skn_rows,
+    unsigned int n_values,
+    unsigned int n_replicas,
+    unsigned int* __restrict__ c0,
+    unsigned int* __restrict__ c0_select_seed, 
+    unsigned int* __restrict__ sketches) 
+{
+    unsigned int sseeds[32];
+    unsigned int global_id = blockIdx.x * blockDim.x + threadIdx.x;
+    unsigned int partition = global_id % n_replicas;
+    unsigned int sketch = global_id / n_replicas;
+
+    for(int i = 0; i < 32; i++){
+        sseeds[i] = c0_select_seed[sketch+i*skn_rows];
+    }
+
+    unsigned int counter = 0;
+    counter = counter-1;
+    for(unsigned int i = partition; i < n_values; i += n_replicas){
+            unsigned int select = 0;
+            for(int k = 0; k < 32; k++)  if(is_set(c0[i],k)) select ^= sseeds[k] ;
+            counter = min(counter,select);
+    }
+    atomicMin(sketches+sketch, counter); 
+}
 
  __global__ void construct_sketch(
     unsigned int skn_rows,
@@ -58,34 +85,25 @@ __device__ unsigned int parity(unsigned int x) {
     unsigned int* __restrict__ c0_select_seed, 
     unsigned int* __restrict__ sketches) 
 {
-    //unsigned int global_size = gridDim.x * blockDim.x;
     unsigned int global_id = blockIdx.x * blockDim.x + threadIdx.x;
-
-    //unsigned full_work_set = skn_rows * n_replicas;
     unsigned int partition_size = (n_values-1)/n_replicas+1;
 
-        unsigned int partition = global_id / skn_rows;
-        unsigned int sketch = global_id % skn_rows;
-        unsigned int sseeds[32];
+    unsigned int partition = global_id / skn_rows;
+    unsigned int sketch = global_id % skn_rows;
+    unsigned int sseeds[32];
 
-        if(sketch < skn_rows){
-            for(int i = 0; i < 32; i++){
-                sseeds[i] = c0_select_seed[sketch+i*skn_rows];
-            }
-        }
+    for(int i = 0; i < 32; i++){
+        sseeds[i] = c0_select_seed[sketch+i*skn_rows];
+    }
 
-   
-
-        unsigned int counter = 0;
-        counter = counter-1;
-        for(unsigned int i = partition*partition_size; i < (partition+1)*partition_size && i < n_values; i++){
-            if(sketch >= skn_rows) continue;
-                unsigned int select = 0;
-                for(int k = 0; k < 32; k++)  if(is_set(c0[i],k)) select ^= sseeds[k] ;
-
-                counter = min(counter,select);
-        }
-        atomicMin(sketches+sketch, counter); 
+    unsigned int counter = 0;
+    counter = counter-1;
+    for(unsigned int i = partition*partition_size; i < (partition+1)*partition_size && i < n_values; i++){
+            unsigned int select = 0;
+            for(int k = 0; k < 32; k++)  if(is_set(c0[i],k)) select ^= sseeds[k] ;
+            counter = min(counter,select);
+    }
+    atomicMin(sketches+sketch, counter); 
 }
 
 
@@ -136,12 +154,8 @@ unsigned long sketch_contruction(parameters* p){
     unsigned int target_utilization = tot_SM*2048;
     unsigned int n_partitions = target_utilization / p->skn_rows;
     unsigned int target_global_size = n_partitions * p->skn_rows;
-    //unsigned int slack = ((p->ts0-1)/n_partitions+1)*n_partitions - p->ts0;
-    
 
     size_t global = target_global_size;
-    //std::cout << "local: " << local << " global:" << global << " partitions: " << n_partitions << std::endl;
-    //std::cout << "Slack: " << slack << std::endl;
 
     auto begin = std::chrono::high_resolution_clock::now();
     construct_sketch<<<global/local, local>>>((unsigned int) p->skn_rows, p->ts0, n_partitions, p->c0, p->c0_select_seed, p->sk_t0);
@@ -181,10 +195,6 @@ int main( int argc, const char* argv[] )
     p.c0_select_seed = (unsigned int*) cudaAllocAndCopy(c0_select_seed, 32*p.skn_rows*sizeof(unsigned int));
 
     unsigned long time = sketch_contruction(&p);
-    //std::cout << "GPU Execution Time: " << time << std::endl;
-    //std::cout << "Normalized execution time: " << ((float) time /p.skn_rows) << std::endl;
-    //std::cout << "Throughput: "<< p.ts0*sizeof(unsigned int)*8.0 / (1000.0*1000.0*1000.0*time/1000.0) << " gbps" << std::endl;
-    //std::cout << "Normalized Throughput: "<< p.ts0*sizeof(unsigned int)*8.0*p.skn_rows / (1000.0*1000.0*1000.0*time/1000.0) << " gbps" << std::endl;
     std::cout << skn_rows << ";" << p.ts0*sizeof(unsigned int)*8.0 / (1000.0*1000.0*1000.0*time/1000.0) << std::endl;
 
     int* res = (int*) malloc(p.skn_rows*sizeof(int));
