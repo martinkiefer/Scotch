@@ -1,5 +1,5 @@
 # CUDA Baselines
-Our CUDA baselines can be compiled with nvcc. 
+Our CUDA baselines can be compiled with nvcc. Make sure to include Boost.
 
 For matrix sketches (FAGMS, CM), the syntax is 
 ```
