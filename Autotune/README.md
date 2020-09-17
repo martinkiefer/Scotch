@@ -35,7 +35,7 @@ python3 ReplicatedMatrixSketchGenerator.py plain
   -cfactor int
       Branching factor for the collect unit. Optional. Defaut: 4.
   -dfactor int
-      Branching factor for the collect unit. Optional. Defaut: 4.
+      Branching factor for the dispatch unit. Optional. Defaut: 4.
   -toolchain [Quarts, Vivado]
       Toolchain used for compilation. Default: Quartus.
 ```
