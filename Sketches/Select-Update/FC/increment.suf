@@ -1,0 +1,1 @@
+outstate <= unsigned(state) + 1;

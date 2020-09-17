@@ -1,0 +1,60 @@
+m[0] <= unsigned(seed(30 downto 0))*unsigned(v);
+a[0] <= unsigned(m[0])+unsigned(seed(61 downto 31));
+vt[0] <= v;
+for i in 0 to 16 {
+    vt[i+1] <= vt[i];    
+}
+
+  
+t1[0] <= unsigned(a[0](62 downto 31)) + unsigned(a[0](30 downto 0));
+t1[1] <= t1[0];
+  
+c2[0] <= unsigned(t1[0]) < 2147483647 ? '1' : '0';
+t2[0] <= c2[0] = '1' ? unsigned(t1[1]) - 2147483647 : unsigned(t1[1]);
+t2[1] <= t2[0];
+  
+c3[0] <= unsigned(t2[0]) < 2147483647 ? '1' : '0';
+t3[0] <= c3[0] = '1' ? unsigned(t2[1]) - 2147483647 : unsigned(t2[1]);
+t3[1] <= t3[0];
+
+c4[0] <= unsigned(t3[0]) < 2147483647 ? '0' : '1';
+intermediate[0] <= c4[0] = '1' ? unsigned(t3[1]) - 2147483647 : unsigned(t3[1]);
+
+
+m[1] <= unsigned(intermediate[0])*unsigned(vt[8]);
+a[1] <= unsigned(m[1])+unsigned(seed(92 downto 62));
+
+t1[2] <= unsigned(a[1](62 downto 31)) + unsigned(a[1](30 downto 0));
+t1[3] <= t1[2];
+
+c2[1] <= unsigned(t1[2]) < 2147483647 ? '0' : '1';
+t2[2] <= c2[1] = '1' ? unsigned(t1[3]) - 2147483647 : unsigned(t1[3]);
+t2[3] <= t2[2];
+
+c3[1] <= unsigned(t2[2]) < 2147483647 ? '0' : '1';
+t3[2] <= c3[1] = '1' ? unsigned(t2[3]) - 2147483647 : unsigned(t2[3]);
+t3[3] <= t3[2];
+
+c4[1] <= unsigned(t3[2]) < 2147483647 ? '0' : '1';
+intermediate[1] <= c4[1] = '1' ? unsigned(t3[3]) - 2147483647 : unsigned(t3[3]);
+
+
+m[2] <= unsigned(intermediate[1])*unsigned(vt[17]);
+a[2] <= unsigned(m[2])+unsigned(seed(123 downto 93));
+
+t1[4] <= unsigned(a[2](62 downto 31)) + unsigned(a[2](30 downto 0));
+t1[5] <= t1[4];
+
+c2[2] <= unsigned(t1[4]) < 2147483647 ? '0' : '1';
+t2[4] <= c2[2] = '1' ? unsigned(t1[5]) - 2147483647 : unsigned(t1[5]);
+t2[5] <= t2[4];
+
+c3[2] <= unsigned(t2[4]) < 2147483647 ? '0' : '1';
+t3[4] <= c3[2] = '1' ? unsigned(t2[5]) - 2147483647 : unsigned(t2[5]);
+t3[5] <= t3[4];
+
+c4[2] <= unsigned(t3[4]) < 2147483647 ? '0' : '1';
+offset <= c4[2] = '1' ? unsigned(t3[5]) - 2147483647 : unsigned(t3[5]);
+
+
+

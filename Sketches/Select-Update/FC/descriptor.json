@@ -1,0 +1,25 @@
+{
+    "selector_seed_size" : 124,
+    "update_seed_size" : 33,
+    "value_size" : 32,
+    "state_size" : 32,
+    "offset_max_size" : 31,
+    "selector_function_file" : "cw5.ssf",
+    "selector_function_variables" : {
+        "m" : 63,
+        "a" : 63,
+        "t1" : 33,
+        "t2" : 32,
+        "t3" : 32,
+        "intermediate" : 31,
+        "vt" : 32,
+        "c2" : 1,
+        "c3" : 1,
+        "c4" : 1
+    },  
+    "update_function_file" : "increment.suf",
+    "update_function_variables" : {
+	"None" : "None"
+    }
+
+}
