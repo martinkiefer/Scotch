@@ -3,10 +3,8 @@ SEED=$2
 PROJECT_NAME="no-io"
 SDC_FILE="tl.sdc"
 
-
-if [ -z "$3" ]; then
-    FMAX="900"
-else
+FMAX=400
+if [ ! -z "$3" ]; then
     FMAX=$3
 fi
 
