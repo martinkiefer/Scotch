@@ -11,7 +11,7 @@ import numpy as np
 sys.path.append(os.path.dirname(os.path.realpath(__file__))+"/../../../ScotchDSL/Translation")
 from ReplicatedColumnSketchGenerator import ReplicatedColumnSketchGenerator
 from DataParallelColumnSketchGenerator import DataParallelColumnSketchGenerator
-from run import *
+from ParserInterface import *
 from Functions import UpdateFunctionGenerator
 from Functions import DataParallelUpdateFunctionGenerator
 from GlobalConfigPackageGenerator import GlobalConfigPackageGenerator
