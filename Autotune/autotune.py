@@ -10,7 +10,7 @@ if __name__ == "__main__":
         help="Regular auto-tune, no database connection, no redundancy elimination, no resume functionality. ")
 
     #Common arguments
-    for parser in [parser_plain, parser_esc]:
+    for parser in [parser_plain]:
     #for parser in [parser_plain]:
         #TODO: Add replicated and data parallel versions
         parser.add_argument("-generator", type=str, choices=["column", "matrix", "column-ma"], required=True)
@@ -20,13 +20,14 @@ if __name__ == "__main__":
         parser.add_argument("-initial_guess", type=int, help="Initial guess for autotune", default=16)
         parser.add_argument("-dp", type=int, help="Data Parallelism Degree")
 
-        parser.add_argument("-quartus_prefix", type=str, help="Prefix to quartus commands. Select according to needs of template.", required=True)
+        parser.add_argument("-toolchain_prefix", type=str, help="Prefix to quartus/vivado commands. Select according to needs of template.", required=True)
         parser.add_argument("-fixrows", type=int, help="Fix the number of rows. Only available parameter for column generators.")
         parser.add_argument("-fixcols", type=int, help="Fix the number of columns.")
         parser.add_argument("-memseg_depth", type=int, help="BRAM depth, for now. In the future, we will solve this with a device specific look-up table.")
 
         parser.add_argument("-descriptor_path", type=str, help="Path to descriptor", required=True)
         parser.add_argument("-template_path", type=str, help="Path to IO template", required=True)
+        parser.add_argument("-toolchain", type=str, help="Used toolchain (Quartus, Vivado)", default="Quartus")
 
     args = mparser.parse_args()
 
@@ -60,7 +61,7 @@ if __name__ == "__main__":
         elif args.generator == "column-ma":
             sketch = Autotune.AutotuneDataParallelColumnSketchWrapper(args.descriptor_path, args.dfactor, args.cfactor)
 
-        ato = Autotune.Optimizer(sketch, args.quartus_prefix, args.template_path, args.initial_guess)
+        ato = Autotune.Optimizer(sketch, args.toolchain_prefix, args.template_path, args.initial_guess, args.toolchain)
         param, df = ato.optimize()
         print(param, df)
         df.to_csv("./parameter_history.csv") 

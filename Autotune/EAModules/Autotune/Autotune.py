@@ -15,8 +15,10 @@ from run import *
 from Functions import UpdateFunctionGenerator
 from Functions import DataParallelUpdateFunctionGenerator
 from GlobalConfigPackageGenerator import GlobalConfigPackageGenerator
-from ..Parsing.PlacementReportParser import PlacementReportParser
-from ..Parsing.TimingReportParser import TimingReportParser
+from ..Parsing import PlacementReportParser
+from ..Parsing import XilinxPlacementReportParser
+from ..Parsing import TimingReportParser
+from ..Parsing import XilinxTimingReportParser
 from ForwardingUpdateFunctionGenerator import ForwardingUpdateFunctionGenerator
 from Functions import SelectorFunctionGenerator
 from ReplicatedMatrixSketchGenerator import ReplicatedMatrixSketchGenerator
@@ -116,7 +118,7 @@ class AutotuneMatrixSketchWrapper:
         ssg.generateFile(gendir)
 
 class Optimizer:
-    def __init__(self, sketch, quartus_prefix, project_folder_path, initial_guess=16):
+    def __init__(self, sketch, quartus_prefix, project_folder_path, initial_guess=16, toolchain="Quartus"):
         self.quartus_prefix = quartus_prefix
         self.project_folder_path = project_folder_path
         self.initial_guess = initial_guess
@@ -124,6 +126,7 @@ class Optimizer:
         self.retries = 5
         self.interval_threshold = 0.01
         self.sketch = sketch
+        self.toolchain = toolchain
         
         self.gendir = "./sketch"
         self.workdir = "./work"
@@ -155,7 +158,10 @@ class Optimizer:
         l_param = self.initial_guess
         #If the initial guess did not provide an upper bound, we have to find one for ourselves
         if u_param is None:
-            u_param = Optimizer.computeMaxTarget(df, self.initial_guess)
+            if self.toolchain == "Quartus":
+                u_param = Optimizer.computeMaxTargetQuartus(df, self.initial_guess)
+            else:
+                u_param = Optimizer.computeMaxTargetVivado(df, self.initial_guess)
 
         current_parameter = self.initial_guess
         while (u_param-l_param)/u_param > self.interval_threshold and u_param - l_param > 1: 
@@ -167,11 +173,30 @@ class Optimizer:
                 l_param = current_parameter
             else:
                 u_param = current_parameter
-
+        print("-- Current state [{},{})".format(l_param, u_param))
         return current_parameter, df_history   
 
     @staticmethod        
-    def computeMaxTarget(df, parameter):
+    def computeMaxTargetVivado(df, parameter):
+        print(df)
+        b =  df[["LUTs", "REGs", "BRAMs", "URAMs"]].to_numpy() - df[["SKETCH_LUTs", "SKETCH_REGs", "SKETCH_BRAMs", "SKETCH_URAMs"]].to_numpy()
+        target = df[["MAX_LUTs", "MAX_REGs", "MAX_BRAMs", "MAX_URAMs"]].to_numpy()
+        a = df[["SKETCH_LUTs", "SKETCH_REGs", "SKETCH_BRAMs", "SKETCH_URAMs"]].to_numpy() / parameter
+        
+        #Handle the case where no BRAMs / URAMs are consumed by the sketch.
+        if a[0,2] == 0:
+            a[0,2] = a[0,0]
+            b[0,2] = b[0,0]
+            target[0,2] = target[0,0]
+        if a[0,3] == 0:
+            a[0,3] = a[0,0]
+            b[0,3] = b[0,0]
+            target[0,3] = target[0,0]
+        return int(np.ceil(np.amin((target-b)/a)))+1
+
+    @staticmethod        
+    def computeMaxTargetQuartus(df, parameter):
+        print(df)
         b =  df[["ALMs", "M20Ks", "M10Ks"]].to_numpy() - df[["SKETCH_ALMs", "SKETCH_M20Ks", "SKETCH_M10Ks"]].to_numpy()
         target = df[["MAX_ALMs", "MAX_M20Ks", "MAX_M10Ks",]].to_numpy()
         a = df[["SKETCH_ALMs", "SKETCH_M20Ks", "SKETCH_M10Ks"]].to_numpy() / parameter
@@ -185,7 +210,8 @@ class Optimizer:
             a[0,2] = a[0,0]
             b[0,2] = b[0,0]
             target[0,2] = target[0,0]
-        return int(np.ceil(np.amin((target-b)/a)))
+        return int(np.ceil(np.amin((target-b)/a)))+1
+
 
     def run_repeat(self, param):
         print("-- Trying parameter {} --".format(param))
@@ -198,7 +224,7 @@ class Optimizer:
         return state, df
 
     def run(self, param, seed, fmax = ""):
-        #print("--- Trying param {} with seed {}".format(param, seed))
+        print("--- Trying param {} with seed {}".format(param, seed))
         #First, we have to generate the code
         if os.path.exists(self.gendir) and os.path.isdir(self.gendir):
             shutil.rmtree(self.gendir)
@@ -220,28 +246,11 @@ class Optimizer:
         process = subprocess.run("bash ./compile.sh {} {} {}".format(self.quartus_prefix, seed, fmax), shell=True)           
         rc = process.returncode
 
-        STATE=None
-        if rc == 0:
-            #Compilation process succeeded. Time to check whether timing is met as well.
-            
-            srf = glob.glob(F"./output_files/*.sta.rpt")
-            srf = srf[0]
-            trp = TimingReportParser(srf)
-            if trp.timing_met():
-                STATE = "SUCCESS"
-            else:
-                STATE = "TIMING_FAILED"
-        elif rc == 3: 
-            STATE = "OUT_OF_RESOURCES"
-        elif rc == 2:
-            raise Exception("Compile script failed in synthesis. Errors in HDL files?".format(rc)) 
-        else:
-            raise Exception("Compile script returned with unexpected exit code {}.".format(rc)) 
-
-        prf = glob.glob(F"./output_files/*.fit.rpt")
-        prf = prf[0]
-        p = PlacementReportParser(prf)
-        df = p.getOptimizerDataFrame(param)
+        STATE, df = None, None
+        if self.toolchain == "Quartus":
+            STATE, df = self.getRunResultsQuartus(rc, param)
+        elif self.toolchain == "Vivado":
+            STATE, df = self.getRunResultsVivado(rc, param)
 
         #Fifth, we return a data frame with the parameters
         os.chdir("../..")
@@ -249,3 +258,63 @@ class Optimizer:
         print(df)
         return STATE, df
     
+    def getRunResultsQuartus(self, rc, param):
+        STATE=None
+        if rc == 0:
+            #Compilation process succeeded. Time to check whether timing is met as well.
+
+            srf = glob.glob(F"./output_files/*.sta.rpt")
+            srf = srf[0]
+            trp = TimingReportParser.TimingReportParser(srf)
+            if trp.timing_met():
+                STATE = "SUCCESS"
+            else:
+                STATE = "TIMING_FAILED"
+        elif rc == 3:
+            STATE = "OUT_OF_RESOURCES"
+        elif rc == 2:
+            raise Exception("Compile script failed in synthesis. Errors in HDL files?".format(rc))
+        else:
+            raise Exception("Compile script returned with unexpected exit code {}.".format(rc))
+
+        prf = glob.glob(F"./output_files/*.fit.rpt")
+        prf = prf[0]
+        p = PlacementReportParser.PlacementReportParser(prf)
+        df = p.getOptimizerDataFrame(param)
+        return STATE, df
+
+    def getRunResultsVivado(self, rc, param):
+        STATE=None
+        if rc == 0:
+            #Compilation process succeeded. Time to check whether timing is met as well.
+
+            srf = glob.glob(F"./*runs/impl_1/*_timing_summary_routed.rpt")
+            srf = srf[0]
+            trp = XilinxTimingReportParser.TimingReportParser(srf)
+            if trp.timing_met():
+                STATE = "SUCCESS"
+            else:
+                STATE = "TIMING_FAILED"
+        elif rc == 3:
+            STATE = "OUT_OF_RESOURCES"
+            d ={"LUTs" : [None], "MAX_LUTs" : [None], "SKETCH_LUTs" : [None],
+                "REGs" : [None], "MAX_REGs" : [None], "SKETCH_REGs" : [None],
+                "BRAMs" : [None], "MAX_BRAMs" : [None], "SKETCH_BRAMs" : [None],
+                "URAMs" : [None], "MAX_URAMs" : [None], "SKETCH_BRAMs" : [None]
+            }
+            df = pd.DataFrame(data=d, index=[param])
+            return STATE, df 
+        elif rc == 2:
+            raise Exception("Compile script failed in synthesis. Errors in HDL files?".format(rc))
+        else:
+            raise Exception("Compile script returned with unexpected exit code {}.".format(rc))
+
+        prf = glob.glob(F"./*runs/impl_1/*_utilization_placed.rpt")
+        hprf = glob.glob(F"./utilization_hierarchy.rpt")
+
+        prf = prf[0]
+        hprf = hprf[0]
+        p = XilinxPlacementReportParser.PlacementReportParser(prf, hprf)
+
+        df = p.getOptimizerDataFrame(param)
+        return STATE, df
