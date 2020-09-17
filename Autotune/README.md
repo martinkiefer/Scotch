@@ -22,8 +22,8 @@ python3 ReplicatedMatrixSketchGenerator.py plain
       Parameter is ignored for column-ma generator as it is fixed in descriptor.
   -memseg_depth int
       Depth of segments used for state memory. Only affects matrix generators.
-  -quartus_prefix str
-      Path to quartus executable. (e.g. /opt/quartus_prime/bin/quartus)
+  -toolchain_prefix str
+      Path to quartus executable. (e.g. /opt/quartus_prime/bin/quartus, /opt/Xilix/bin)
   -fix_rows int
       Fix the number of rows to a particular value. Columns are optimized then. 
       Forbidden for column-ma and column. Can not be used together with fix_cols.
@@ -36,5 +36,6 @@ python3 ReplicatedMatrixSketchGenerator.py plain
       Branching factor for the collect unit. Optional. Defaut: 4.
   -dfactor int
       Branching factor for the collect unit. Optional. Defaut: 4.
-  
+  -toolchain [Quarts, Vivado]
+      Toolchain used for compilation. Default: Quartus.
 ```
