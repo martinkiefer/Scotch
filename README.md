@@ -27,3 +27,5 @@ A publication on Scotch is currently prepared. Stay tuned for the publication an
 **Sketches:** ScotchDSL implementations of sketching algorithms.
 
 **IO-Controllers:** I/O controller examples.
+
+[Our reproducibility can help to get you started.](https://github.com/martinkiefer/Scotch/wiki/Reproducibility)
