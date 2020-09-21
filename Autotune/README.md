@@ -9,7 +9,7 @@ The synthesis projects created and compiled in the process are found in the ./wo
 Depending on the FPGA used, running autotune can take several days and consume tens of Gigabytes of data. Use tmux/nohup and provide disk space accordingly.
 
 ```
-python3 ReplicatedMatrixSketchGenerator.py plain
+python3 autotune.py plain
   -generator [column, matrix, column-ma] 
       Type of generator used. column and matrix use the select-update model. 
       Column-ma is for column sketches given in map-apply.
