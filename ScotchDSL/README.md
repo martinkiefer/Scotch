@@ -8,7 +8,7 @@ It generates the parser files and copies them to the translation directory where
 # RTL Generators
 There are differente code generators available in ./Translation. They differ in the sketches they support and programming model assumed. All of them can also be used without invoking Autotune. All of them require a sketch descriptor as an input argument that contains parameters and points to the ScotchDSL functions (see the ../Sketches folder for examples). The code generation target is VHDL.
 
-## Matrix Sketches
+## Matrix Sketches / Row Sketches
 For matrix sketches, there is only ReplicatedMatrixSketchGenerator.py. It assumes the Select-Update model and uses the following arguments:
 
 ```
