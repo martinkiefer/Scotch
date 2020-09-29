@@ -28,4 +28,7 @@ A publication on Scotch is currently prepared. Stay tuned for the publication an
 
 **IO-Controllers:** I/O controller examples.
 
+**Util:** Miscallaneous little helpers. Contains scripts for scaling experiments.
+
+
 [Our reproducibility wiki page can help to get you started.](https://github.com/martinkiefer/Scotch/wiki/Reproducibility)
