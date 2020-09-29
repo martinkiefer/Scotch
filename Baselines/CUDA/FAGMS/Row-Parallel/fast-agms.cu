@@ -105,6 +105,8 @@ __device__ unsigned int parity(unsigned int x) {
         sseeds[i] = c0_select_seed[sketch+i*skn_rows];
     }
 
+    //Energy consumption endless loop. Comment in, if necessary.
+    //while(1)
     for(unsigned int i = partition*partition_size; i < (partition+1)*partition_size && i < n_values; i++){
         unsigned int select = 0;
         for(int k = 0; k < 32; k++)  if(is_set(c0[i],k)) select ^= sseeds[k] ;
@@ -160,10 +162,12 @@ unsigned int* readUArrayFromFile(const char* filename, size_t * filesize = NULL)
 }
 
 double sketch_contruction(parameters* p){
-    size_t local = 32;
+    size_t local = 64;
     int tot_SM = 0;
+    int tot_tpsm = 0;
     cudaDeviceGetAttribute(&tot_SM, cudaDevAttrMultiProcessorCount, 0);
-    unsigned int target_utilization = tot_SM*2048;
+    cudaDeviceGetAttribute(&tot_tpsm, cudaDevAttrMaxThreadsPerMultiProcessor, 0);
+    unsigned int target_utilization = tot_SM*tot_tpsm;
     unsigned int n_partitions = target_utilization / p->skn_rows;
     unsigned int target_global_size = n_partitions * p->skn_rows;
     

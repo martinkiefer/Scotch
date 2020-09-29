@@ -124,13 +124,18 @@ unsigned int* readUArrayFromFile(const char* filename, size_t * filesize = NULL)
 }
 
 double sketch_contruction(parameters* p){
-    size_t local = 32;
+    size_t local = 64;
     int tot_SM = 0;
+    int tot_tpsm = 0;
     cudaDeviceGetAttribute(&tot_SM, cudaDevAttrMultiProcessorCount, 0);
-    unsigned int target_utilization = tot_SM*2048;
+    cudaDeviceGetAttribute(&tot_tpsm, cudaDevAttrMaxThreadsPerMultiProcessor, 0);
+    unsigned int target_utilization = tot_SM*tot_tpsm;
     size_t global = target_utilization;
 
     auto begin = std::chrono::high_resolution_clock::now();
+
+    //Energy consumption endless loop. Comment in, if necessary.
+    //while(1)
     for(unsigned int r = 0; r < p->skn_rows; r++){
         construct_sketch<<<global/local, local>>>(r, (unsigned int) p->skn_cols, p->ts0, p->c0, p->c0_lseed, p->c0_sseed, p->c0_select_seed, p->sk_t0);
         gpuErrchk(cudaPeekAtLastError());

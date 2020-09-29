@@ -79,7 +79,8 @@ __device__ unsigned int parity(unsigned int x) {
     unsigned long b3 = c0_select_seed[3]; 
     unsigned int r = global_id % replicas;
 
-
+    //Energy consumption endless loop. Comment in, if necessary.
+    //while(1)
     for(unsigned int i = global_id; i < n_values; i += global_size){
             unsigned int select = cw4(a, b1, b2, b3, c0[i]);
             select = select % skn_cols;
@@ -132,10 +133,13 @@ unsigned int* readUArrayFromFile(const char* filename, size_t * filesize = NULL)
 }
 
 double sketch_contruction(parameters* p){
-    size_t local = 32;
+    size_t local = 64;
     int tot_SM = 0;
+    int tot_tpsm = 0;
     cudaDeviceGetAttribute(&tot_SM, cudaDevAttrMultiProcessorCount, 0);
-    unsigned int target_utilization = tot_SM*2048;
+    cudaDeviceGetAttribute(&tot_tpsm, cudaDevAttrMaxThreadsPerMultiProcessor, 0);
+    unsigned int target_utilization = tot_SM*tot_tpsm;
+
     size_t global = target_utilization;
 
     auto begin = std::chrono::high_resolution_clock::now();

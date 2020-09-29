@@ -90,12 +90,16 @@ __device__ unsigned int parity(unsigned int x) {
     unsigned int my_c0_ls = c0_ls[sketch]; 
     unsigned int my_c0_ss = is_set(c0_ss[sketch/32], sketch % 32);
    
-    int counter = 0;
-    for(unsigned int i = partition*partition_size; i < (partition+1)*partition_size && i < n_values; i++){
-            int update = ech3(c0[i],my_c0_ls,my_c0_ss);
-            counter += update;
+    //Energy consumption endless loop. Comment in, if necessary.
+    //while(1)
+    {
+        int counter = 0;
+        for(unsigned int i = partition*partition_size; i < (partition+1)*partition_size && i < n_values; i++){
+                int update = ech3(c0[i],my_c0_ls,my_c0_ss);
+                counter += update;
+        }
+        atomicAdd(sketches+sketch, counter); 
     }
-    atomicAdd(sketches+sketch, counter); 
 }
 
 
@@ -143,8 +147,10 @@ unsigned int* readUArrayFromFile(const char* filename, size_t * filesize = NULL)
 unsigned long sketch_contruction(parameters* p){
     size_t local = 64;
     int tot_SM = 0;
+    int tot_tpsm = 0;
     cudaDeviceGetAttribute(&tot_SM, cudaDevAttrMultiProcessorCount, 0);
-    unsigned int target_utilization = tot_SM*2048;
+    cudaDeviceGetAttribute(&tot_tpsm, cudaDevAttrMaxThreadsPerMultiProcessor, 0);
+    unsigned int target_utilization = tot_SM*tot_tpsm;
     unsigned int n_partitions = target_utilization / p->skn_rows;
     unsigned int target_global_size = n_partitions * p->skn_rows;
 

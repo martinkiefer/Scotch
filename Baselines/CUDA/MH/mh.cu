@@ -150,8 +150,10 @@ unsigned int* readUArrayFromFile(const char* filename, size_t * filesize = NULL)
 unsigned long sketch_contruction(parameters* p){
     size_t local = 64;
     int tot_SM = 0;
+    int tot_tpsm = 0;
     cudaDeviceGetAttribute(&tot_SM, cudaDevAttrMultiProcessorCount, 0);
-    unsigned int target_utilization = tot_SM*2048;
+    cudaDeviceGetAttribute(&tot_tpsm, cudaDevAttrMaxThreadsPerMultiProcessor, 0);
+    unsigned int target_utilization = tot_SM*tot_tpsm;
     unsigned int n_partitions = target_utilization / p->skn_rows;
     unsigned int target_global_size = n_partitions * p->skn_rows;
 
