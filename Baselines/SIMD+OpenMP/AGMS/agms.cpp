@@ -111,6 +111,8 @@ unsigned long sketch_contruction(parameters* p){
     unsigned int partition_size = (p->ts0-1) / cnt + 1;
     int id = omp_get_thread_num();
 
+    //Energy consumption endless loop. Comment in, if necessary.
+    //while(1)
     for(unsigned int i = 0; i < p->skn_rows; i+=16){
         v16si* vsk = (v16si*) __builtin_assume_aligned(p->sk_t0+id*p->skn_rows+i, 64);
         v16si counter = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};

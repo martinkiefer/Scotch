@@ -143,6 +143,8 @@ unsigned long sketch_contruction(parameters* p){
     unsigned int data_upper = (p->ts0 / 8) * 8;
     unsigned int upper = std::min(partition_upper, data_upper);
 
+    //Energy consumption endless loop. Comment in, if necessary.
+    //while(1)
     for(unsigned int i = 0; i < p->skn_rows; i++){
 	unsigned int j = id*(partition_size);
         for(j = id*(partition_size); j < upper; j += 8){
