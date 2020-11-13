@@ -26,7 +26,7 @@ __device__ unsigned int parity(unsigned int x) {
  }
  
  __device__ unsigned int nonlinear_h(unsigned int x) {
-     return parity((x >> 0) | (x >> 1));
+     return parity(((x << 0) | (x << 1)) & 0xAAAAAAAA );
  }
  
  __device__ unsigned int is_set(unsigned int x, unsigned int pos) {
