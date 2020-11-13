@@ -66,7 +66,7 @@ unsigned int parity(unsigned int x) {
 }
 
 unsigned int nonlinear_h(unsigned int x) {
-    return __builtin_parity((x >> 0) | (x >> 1));
+    return __builtin_parity(((x << 0) | (x << 1)) & 0xAAAAAAAA);
 }
 
 v16ui is_set(v16ui x, v16ui pos) {
