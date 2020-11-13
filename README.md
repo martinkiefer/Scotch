@@ -11,7 +11,7 @@ Scotch has a corresponding publication in PVLDB (soon available):
 *Martin Kiefer, Ilias Poulakis, Sebastian Breß, and Volker Markl. Scotch: Generating FPGA-Accelerators for Sketching at Line Rate. PVLDB, 14(3), 2021.*
 
 ## Requirements
-* A recent Linux operating system. For the code generator, OSX will do either.
+* A recent Linux operating system. For the code generator in isolation, OSX will do either.
 * Python 3.6+ is required. We used Python 3.6.
 * The following Python modules are required (used version in brackets): antlr4-python3-runtime (4.7.2), numpy (1.170), pandas (0.25.0).
 * The ANTLR4 parser generator is required to generate the ScotchDSL parser (4.7.2). A setup script is provided for your convenience that downloads the appropriate jar and generates the parser. See README in the ScotchDSL folder.
