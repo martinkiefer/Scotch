@@ -1,6 +1,6 @@
 t1 <= parity(seed(32 downto 1) & v);
 
 
-t2 <= parity(v(30 downto 0) | v(31 downto 1));
+t2 <= parity((v(30 downto 0) | v(31 downto 1) & '1010101010101010101010101010101');
 	
 outstate <= t1 ^ t2 ^ seed(0) = '0' ? signed(state) + 1 : signed(state) - 1;
