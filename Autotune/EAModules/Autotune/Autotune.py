@@ -33,6 +33,7 @@ class AutotuneColumnSketchWrapper:
         self.dfactor = dfactor
         self.cfactor = cfactor
         self.dp = dp
+        self.substitution_factor = 1
 
         if not "initial_state" in self.data:
             selfdata["initial_state"] = "(others => '0')"
@@ -55,6 +56,7 @@ class AutotuneDataParallelColumnSketchWrapper:
         
         self.dfactor = dfactor
         self.cfactor = cfactor
+        self.substitution_factor = 1
 
         if not "initial_state" in self.data:
             self.data["initial_state"] = "(others => '0')"
@@ -87,6 +89,7 @@ class AutotuneMatrixSketchWrapper:
         self.fixcol = fixcol
         self.fixrow = fixrow
         self.dp = dp
+        self.substitution_factor = 2
 
         self.dfactor = dfactor
         self.cfactor = cfactor
@@ -162,6 +165,9 @@ class Optimizer:
                 u_param = Optimizer.computeMaxTargetQuartus(df, self.initial_guess)
             else:
                 u_param = Optimizer.computeMaxTargetVivado(df, self.initial_guess)
+
+            if not u_param is None:
+                u_param = u_param * sketch.substitution_factor
 
         current_parameter = self.initial_guess
         while (u_param-l_param)/u_param > self.interval_threshold and u_param - l_param > 1: 
