@@ -6,7 +6,7 @@ It provides three core features:
 * Code Generators: ScotchDSL specifications are automatically translated into a VHDL architecture containing all necessary components to perform sketching.
 * Auto-Tune: An automated tuning algorithms optimizes the size of the sketch summary with respect to provided constraints and resources on the FPGA
 
-Scotch has a corresponding publication in PVLDB (soon available):
+Scotch has a corresponding publication in PVLDB:
 
 *Martin Kiefer, Ilias Poulakis, Sebastian Breß, and Volker Markl. Scotch: Generating FPGA-Accelerators for Sketching at Line Rate. PVLDB, 14(3), 2021.*
 
